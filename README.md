@@ -2,10 +2,15 @@
 
 ## makefile targets
 
-- `make all PROJECT=<PROJECT_NAME>` - compile, deploy and listen on serial output 
-- `make deploy PROJECT=<PROJECT_NAME>` - compile and deploy 
+- `make all PROJECT=<PROJECT_NAME> [UPLOAD_FLAGS=<FLAGS>]` - compile, upload (optionally specifying upload flags) and listen on serial output 
+- `make upload PROJECT=<PROJECT_NAME> [UPLOAD_FLAGS=<FLAGS>]` - compile and upload (optionally specifying upload flags)
 - `make compile PROJECT=<PROJECT_NAME>` - compile
 - `make listen` - listen on serial output
+- `make clean PROJECT=<PROJECT_NAME>` - clean build outputs
+
+`UPLOAD_FLAGS` should be specified as a comma separated list and can be looked up in the verbose output of the Arduino IDE during upload. For example:
+
+- `wipe=all` - erase the flash first
 
 ## Add ESP8266 core to arduino-cli
 

@@ -1,15 +1,28 @@
-.PHONY: all compile deploy listen
+.PHONY: all compile upload listen clean
 
-all: deploy listen
+FQBN:=esp8266:esp8266:generic
+FQBN_FILE:=$(subst :,.,${FQBN})
 
-${PROJECT}/${PROJECT}.esp8266.esp8266.generic.elf: ${PROJECT}/${PROJECT}.ino
-	arduino-cli compile --fqbn esp8266:esp8266:generic ${PROJECT}
+ifdef UPLOAD_FLAGS
+	UPLOAD_FQBN:=${FQBN}:${UPLOAD_FLAGS}
+else
+	UPLOAD_FQBN:=${FQBN}
+endif
 
-compile: ${PROJECT}/${PROJECT}.esp8266.esp8266.generic.elf
+all: upload listen
 
-deploy: compile
-	arduino-cli upload -p /dev/cu.usbserial-A100AVYN --fqbn esp8266:esp8266:generic ${PROJECT}
+${PROJECT}/${PROJECT}.${FQBN_FILE}.elf: ${PROJECT}/${PROJECT}.ino
+	arduino-cli compile --fqbn ${FQBN} ${PROJECT}
+
+compile: ${PROJECT}/${PROJECT}.${FQBN_FILE}.elf
+
+upload: compile
+	arduino-cli upload -p /dev/cu.usbserial-A100AVYN --fqbn ${UPLOAD_FQBN} ${PROJECT}
 
 listen:
 	stty -f /dev/cu.usbserial-A100AVYN 9600
 	cat /dev/cu.usbserial-A100AVYN
+
+clean:
+	rm ${PROJECT}/${PROJECT}.${FQBN_FILE}.elf
+	rm ${PROJECT}/${PROJECT}.${FQBN_FILE}.bin
