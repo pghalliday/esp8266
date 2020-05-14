@@ -1,6 +1,6 @@
 # esphome
 
-Testing the use of esphome to program a device
+Testing the use of esphome to program a `Wemos D1 mini pro` device
 
 Create a `secrets.yaml` file with the following contents
 
@@ -30,5 +30,5 @@ pipenv shell
 From the pipenv shell:
 
 ```
-esphome livingroom.yaml run
+esphome laboratory.yaml run
 ```
