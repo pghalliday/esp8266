@@ -35,23 +35,27 @@ sensor:
     on_value:
       then:
         - lambda: |-
-            id(rotary_encoder_1).set_value(0);
-            LightColorValues light_values = id(light_1).remote_values;
-            bool is_on = light_values.is_on();
-            float current_brightness = is_on ? light_values.get_brightness() : 0.0;
-            float new_brightness = current_brightness + (x / 20.0);
-            if (new_brightness <= 0) {
-              auto call = id(light_1).turn_off();
-              call.set_transition_length(0); // ms
-              call.set_brightness(1.0);
-              call.perform();
-            } else {
-              auto call = id(light_1).turn_on();
-              call.set_transition_length(100); // ms
-              call.set_brightness(new_brightness);
-              call.perform();
+            float dimmer_steps = 20.0;
+            if (x != 0.0) {
+              id(rotary_encoder_1).set_value(0);
+              LightColorValues light_values = id(light_1).remote_values;
+              bool is_on = light_values.is_on();
+              float current_brightness = is_on ? light_values.get_brightness() : 0.0;
+              float new_brightness = current_brightness + (x / dimmer_steps);
+              new_brightness = new_brightness < 1.0 ? new_brightness : 1.0;
+              if (new_brightness < 1 / dimmer_steps) {
+                auto call = id(light_1).turn_off();
+                call.set_transition_length(0); // ms
+                call.set_brightness(1.0);
+                call.perform();
+              } else {
+                auto call = id(light_1).turn_on();
+                call.set_transition_length(100); // ms
+                call.set_brightness(new_brightness);
+                call.perform();
+              }
+              delay(100); // ms
             }
-            delay(100); // ms
 
 binary_sensor:
   - platform: gpio
