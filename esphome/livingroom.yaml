@@ -1,16 +1,18 @@
+<<: !include ./secrets.yaml
+
 esphome:
   name: esp8266test
   platform: ESP8266
   board: esp01_1m
 
 wifi:
-  ssid: "ssid"
-  password: "password"
+  ssid: $wifi_ssid
+  password: $wifi_password
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Esp8266Test Fallback Hotspot"
-    password: "password"
+    ssid: $fallback_ssid
+    password: $fallback_password
 
 captive_portal:
 
@@ -19,10 +21,10 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: "password"
+  password: $api_password
 
 ota:
-  password: "password"
+  password: $ota_password
 
 switch:
   - platform: gpio

@@ -3,6 +3,9 @@
 FQBN:=esp8266:esp8266:generic
 FQBN_FILE:=$(subst :,.,${FQBN})
 
+DEVICE:=usbserial-A100AVYN
+BAUDRATE:=9600
+
 ifdef UPLOAD_FLAGS
 	UPLOAD_FQBN:=${FQBN}:${UPLOAD_FLAGS}
 else
@@ -17,11 +20,11 @@ ${PROJECT}/${PROJECT}.${FQBN_FILE}.elf: ${PROJECT}/${PROJECT}.ino
 compile: ${PROJECT}/${PROJECT}.${FQBN_FILE}.elf
 
 upload: compile
-	arduino-cli upload -p /dev/cu.usbserial-A100AVYN --fqbn ${UPLOAD_FQBN} ${PROJECT}
+	arduino-cli upload -p /dev/cu.${DEVICE} --fqbn ${UPLOAD_FQBN} ${PROJECT}
 
 listen:
-	stty -f /dev/cu.usbserial-A100AVYN 9600
-	cat /dev/cu.usbserial-A100AVYN
+	stty -f /dev/cu.${DEVICE} ${BAUDRATE}
+	cat /dev/cu.${DEVICE}
 
 clean:
 	rm ${PROJECT}/${PROJECT}.${FQBN_FILE}.elf
