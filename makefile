@@ -1,9 +1,9 @@
 .PHONY: all compile upload listen clean
 
-FQBN:=esp8266:esp8266:generic
+FQBN:=esp8266:esp8266:d1_mini_pro
 FQBN_FILE:=$(subst :,.,${FQBN})
 
-DEVICE:=usbserial-A100AVYN
+DEVICE:=usbserial-01EF8BB1
 BAUDRATE:=9600
 
 ifdef UPLOAD_FLAGS
@@ -14,10 +14,8 @@ endif
 
 all: upload listen
 
-${PROJECT}/${PROJECT}.${FQBN_FILE}.elf: ${PROJECT}/${PROJECT}.ino
+compile:
 	arduino-cli compile --fqbn ${FQBN} ${PROJECT}
-
-compile: ${PROJECT}/${PROJECT}.${FQBN_FILE}.elf
 
 upload: compile
 	arduino-cli upload -p /dev/cu.${DEVICE} --fqbn ${UPLOAD_FQBN} ${PROJECT}
