@@ -3,10 +3,6 @@
 
 #include "Arduino.h"
 
-#define BUTTON_BUFFER_SIZE 8
-#define BUTTON_LEFT (-1)
-#define BUTTON_RIGHT 1
-
 class Button {
   using f_onRelease = void(*)();
 
