@@ -40,6 +40,13 @@ void config_setupReset() {
   config_resetPinState = digitalRead(config_resetPin);
 }
 
+void config_reset() {
+  Serial.println("Resetting...");
+  WiFi.disconnect();
+  delay(2000);
+  ESP.reset();
+}
+
 void config_loopReset() {
   int resetPinState = digitalRead(config_resetPin);
   if (resetPinState == LOW) {
@@ -47,9 +54,7 @@ void config_loopReset() {
       config_resetStart = millis();
     } else {
       if (millis() - config_resetStart > config_resetTimeout) {
-        Serial.println("Resetting...");
-        wifiManager.resetSettings();
-        ESP.reset();
+        config_reset();
       }
     }
   }
