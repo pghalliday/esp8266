@@ -8,8 +8,11 @@
 #define ROTARY_ENCODER_RIGHT 1
 
 class RotaryEncoder {
+  using f_interruptDispatch = void(*)();
+  using f_onChange = void(*)(int direction);
+
   public:
-    RotaryEncoder(int pinA, int pinB, void (*interruptDispatch)(), void (*onChange)(int));
+    RotaryEncoder(int pinA, int pinB, f_interruptDispatch interruptDispatch, f_onChange onChange);
     void setup();
     void loop();
     ICACHE_RAM_ATTR void interrupt();
@@ -22,8 +25,8 @@ class RotaryEncoder {
     volatile unsigned int _writePos;
     unsigned int _readPos;
     unsigned int _state;
-    void (*_interruptDispatch)();
-    void (*_onChange)(int);
+    f_interruptDispatch _interruptDispatch;
+    f_onChange _onChange;
 };
 
 #endif

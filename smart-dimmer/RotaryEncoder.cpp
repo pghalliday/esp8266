@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "RotaryEncoder.h"
 
-RotaryEncoder::RotaryEncoder(int pinA, int pinB, void (*interruptDispatch)(), void (*onChange)(int)) {
+RotaryEncoder::RotaryEncoder(int pinA, int pinB, f_interruptDispatch interruptDispatch, f_onChange onChange) {
   _pinA = pinA;
   _pinB = pinB;
   _interruptDispatch = interruptDispatch;
