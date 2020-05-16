@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#define ROTARY_ENCODER_BUFFER_SIZE 1024
+#define ROTARY_ENCODER_BUFFER_SIZE 8
 #define ROTARY_ENCODER_LEFT (-1)
 #define ROTARY_ENCODER_RIGHT 1
 
