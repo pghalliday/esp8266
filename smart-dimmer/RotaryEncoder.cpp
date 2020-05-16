@@ -52,19 +52,17 @@ void RotaryEncoder::interrupt() {
     } else {
       state = ROTARY_ENCODER_A_FALLING;
     }
+    _pinAState = pinAState;
   } else if (pinBState != _pinBState) {
     if (pinBState == HIGH) {
       state = ROTARY_ENCODER_B_RISING;
     } else {
       state = ROTARY_ENCODER_B_FALLING;
     }
+    _pinBState = pinBState;
   }
-
   if (state != 0) {
     _buffer[_writePos] = state;
     _writePos = (_writePos + 1) % ROTARY_ENCODER_BUFFER_SIZE;
   }
-
-  _pinAState = pinAState;
-  _pinBState = pinBState;
 }
