@@ -1,7 +1,8 @@
 #include "RotaryEncoder.h"
 
 ICACHE_RAM_ATTR void knobInterruptDispatch();
-RotaryEncoder knob(D5, D6, &knobInterruptDispatch, &knobOnChange);
+void knobOnChange(int direction);
+RotaryEncoder knob(D5, D6, knobInterruptDispatch, knobOnChange);
 
 void setup() {
   Serial.begin(9600);

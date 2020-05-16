@@ -11,6 +11,8 @@ RotaryEncoder::RotaryEncoder(int pinA, int pinB, f_interruptDispatch interruptDi
 void RotaryEncoder::setup() {
   pinMode(_pinA, INPUT);
   pinMode(_pinB, INPUT);
+  _pinAState = digitalRead(_pinA);
+  _pinBState = digitalRead(_pinB);
   attachInterrupt(digitalPinToInterrupt(_pinA), _interruptDispatch, CHANGE);
   attachInterrupt(digitalPinToInterrupt(_pinB), _interruptDispatch, CHANGE);
 }
