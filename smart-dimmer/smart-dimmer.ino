@@ -33,14 +33,14 @@ void loop() {
 }
 
 void lightOnUpdate(bool on, int brightness) {
-  Serial.print("lightOnUpdate: on: ");
+  Serial.print(F("lightOnUpdate: on: "));
   Serial.print(on);
-  Serial.print(": brightness: ");
+  Serial.print(F(": brightness: "));
   Serial.println(brightness);
 }
 
 void buttonOnRelease() {
-  Serial.println("buttonOnRelease");
+  Serial.println(F("buttonOnRelease"));
   light.toggle();
 }
 
@@ -49,12 +49,12 @@ void knobInterruptDispatch() {
 }
 
 void knobOnChange(int direction) {
-  Serial.print("knobOnChange: direction: ");
+  Serial.print(F("knobOnChange: direction: "));
   Serial.println(direction);
   light.changeBrightness(direction);
 }
 
 void networkOnStateChange(int state) {
-  Serial.print("networkOnStateChange: state: ");
+  Serial.print(F("networkOnStateChange: state: "));
   Serial.println(state);
 }

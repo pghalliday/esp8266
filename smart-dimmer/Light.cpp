@@ -29,7 +29,7 @@ void Light::_update() {
     digitalWrite(_pin, LOW);
   } else {
     int pwmLevel = LIGHT_PWM_LEVEL(_brightness);
-    Serial.print("Light::_update: pwmLevel: ");
+    Serial.print(F("Light::_update: pwmLevel: "));
     Serial.println(pwmLevel);
     analogWrite(_pin, pwmLevel);
   }
