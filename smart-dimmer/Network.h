@@ -5,25 +5,28 @@
 #include <functional>
 #include "WifiConfig.h"
 
-#define NETWORK_MODE_AP 1
-#define NETWORK_MODE_STATION 2
-#define NETWORK_MODE_BOTH 3
-
-#define NETWORK_CONFIG_SSID_BUFFER_SIZE 33
-#define NETWORK_CONFIG_PASSWORD_BUFFER_SIZE 64
-
-#define NETWORK_CONFIG_FIELDS_LENGTH 2
-
 class Network {
-  using f_onStateChange = std::function<void(int state)>;
+  public:
+    enum class Mode {
+      AP,
+      STATION,
+      BOTH
+    };
+
+    enum class State {
+      IDLE,
+      AP_ACTIVE
+    };
+
+  using f_onStateChange = std::function<void(State state)>;
 
   public:
     static Network *getInstance();
     void setup(f_onStateChange onStateChange);
     void loop();
-    int getState();
-    void setMode(int mode);
-    int getMode();
+    State getState();
+    void setMode(Network::Mode);
+    Mode getMode();
     void setStationConfig(char *ssid, char *password);
     void resetStationConfig();
     char *getStationSsid();
@@ -48,7 +51,9 @@ class Network {
     void _onStationConfigChange(const char *ssid, const char *password);
     WifiConfig _apConfig;
     void _onApConfigChange(const char *ssid, const char *password);
-    int _mode;
+    Mode _mode;
+    State _state;
+    void _setState(State state);
 };
 
 #endif

@@ -10,16 +10,12 @@ void WifiConfig::init(f_onChange onChange, const char *path, const char *default
   _onChange = onChange;
   _defaultSsid = defaultSsid;
   _defaultPassword = defaultPassword;
-  const size_t capacity =
+  StaticJsonDocument<
     WIFI_CONFIG_FIELD_COUNT +
     sizeof(WifiConfig::_ssidFieldName) +
     WIFI_CONFIG_SSID_BUFFER_SIZE +
     sizeof(WifiConfig::_passwordFieldName) +
-    WIFI_CONFIG_PASSWORD_BUFFER_SIZE;
-  Serial.print("WifiConfig::init - JSON capacity: ");
-  Serial.println(capacity);
-  Serial.println(sizeof(WifiConfig::_passwordFieldName));
-  StaticJsonDocument<capacity> doc;
+    WIFI_CONFIG_PASSWORD_BUFFER_SIZE> doc;
   _configFile.init(path, &doc);
   _applyDoc(&doc);
 }
@@ -47,10 +43,7 @@ void WifiConfig::_applyConfig(const char *ssid, const char *password) {
 }
 
 void WifiConfig::setConfig(const char *ssid, const char *password) {
-  const size_t capacity = WIFI_CONFIG_FIELD_COUNT;
-  Serial.print("WifiConfig::setConfig -  JSON capacity: ");
-  Serial.println(capacity);
-  StaticJsonDocument<capacity> doc;
+  StaticJsonDocument<WIFI_CONFIG_FIELD_COUNT> doc;
   doc[WifiConfig::_ssidFieldName] = ssid;
   doc[WifiConfig::_passwordFieldName] = password;
   _configFile.write(&doc);

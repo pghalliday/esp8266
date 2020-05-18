@@ -2,8 +2,8 @@
 #include <ESP8266WiFi.h>
 #include "Network.h"
 
-const char *Network::_stationConfigFilePath = "/network/station.json";
-const char *Network::_apConfigFilePath = "/network/ap.json";
+const char *Network::_stationConfigFilePath = "/config/network/station.json";
+const char *Network::_apConfigFilePath = "/config/network/ap.json";
 const char *Network::_defaultStationSsid = "";
 const char *Network::_defaultStationPassword = "";
 const char *Network::_defaultApSsid = "smart-dimmer";
@@ -28,22 +28,38 @@ void Network::setup(f_onStateChange onStateChange) {
       Network::_apConfigFilePath,
       Network::_defaultApSsid,
       Network::_defaultApPassword);
+
+  _setState(Network::State::IDLE);
 }
 
 void Network::loop() {
   // TODO: Check status and notify state changes
+  if (_state == Network::State::IDLE) {
+    if (WiFi.softAP(_apConfig.getSsid(), _apConfig.getPassword())) {
+      Serial.print(F("Network::loop - Started AP, IP address: "));
+      Serial.println(WiFi.softAPIP());
+      _setState(Network::State::AP_ACTIVE);
+    } else {
+      Serial.println(F("Network::loop - Failed to start AP"));
+    }
+  }
 }
 
-int Network::getState() {
-  // TODO
+Network::State Network::getState() {
+  return _state;
 }
 
-void Network::setMode(int mode) {
+void Network::_setState(Network::State state) {
+  _state = state;
+  _onStateChange(_state);
+}
+
+void Network::setMode(Network::Mode mode) {
   _mode = mode;
   // TODO
 }
 
-int Network::getMode() {
+Network::Mode Network::getMode() {
   return _mode;
 }
 
