@@ -1,6 +1,7 @@
 #include "Light.h"
 #include "Button.h"
 #include "RotaryEncoder.h"
+#include "LittleFS.h"
 #include "Network.h"
 
 void lightOnUpdate(bool on, int brightness);
@@ -14,21 +15,22 @@ void knobOnChange(int direction);
 RotaryEncoder knob(D5, D6, knobInterruptDispatch, knobOnChange);
 
 void networkOnStateChange(int state);
-Network network(networkOnStateChange);
+Network *network = Network::getInstance();
 
 void setup() {
   Serial.begin(9600);
+  LittleFS.begin();
   light.setup();
   button.setup();
   knob.setup();
-  network.setup();
+  network->setup(networkOnStateChange);
   config_setup(D2, 5000);
 }
 
 void loop() {
   button.loop();
   knob.loop();
-  network.loop();
+  network->loop();
   config_loop();
 }
 

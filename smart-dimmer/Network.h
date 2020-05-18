@@ -2,7 +2,7 @@
 #define Network_h
 
 #include "Arduino.h"
-#include "Config.h"
+#include "WifiConfig.h"
 
 #define NETWORK_MODE_AP 1
 #define NETWORK_MODE_STATION 2
@@ -15,14 +15,10 @@
 
 class Network {
   using f_onStateChange = void(*)(int state);
-  using t_config = struct {
-    char ssid[NETWORK_CONFIG_SSID_BUFFER_SIZE];
-    char password[NETWORK_CONFIG_PASSWORD_BUFFER_SIZE];
-  };
 
   public:
-    Network(f_onStateChange onStateChange);
-    void setup();
+    static Network *getInstance();
+    void setup(f_onStateChange onStateChange);
     void loop();
     int getState();
     void setMode(int mode);
@@ -37,22 +33,19 @@ class Network {
     char *getApPassword();
     void scan();
   private:
+    Network(){};
+    Network(Network const&){};
+    Network& operator=(Network const&){};
     static const char *_stationConfigFilePath;
     static const char *_apConfigFilePath;
-    static const char *_ssidFieldName;
-    static const char *_passwordFieldName;
     static const char *_defaultStationSsid;
     static const char *_defaultStationPassword;
     static const char *_defaultApSsid;
     static const char *_defaultApPassword;
     f_onStateChange _onStateChange;
-    t_config _stationConfig;
-    ConfigField _stationConfigFields[NETWORK_CONFIG_FIELDS_LENGTH];
-    Config _stationConfigFile;
-    t_config _apConfig;
-    ConfigField _apConfigFields[NETWORK_CONFIG_FIELDS_LENGTH];
+    WifiConfig _stationConfig;
+    WifiConfig _apConfig;
     int _mode;
-    Config _apConfigFile;
 };
 
 #endif

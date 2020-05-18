@@ -1,61 +1,28 @@
 #include "Arduino.h"
-#include "Config.h"
 #include "Network.h"
 
 const char *Network::_stationConfigFilePath = "/network/station.json";
 const char *Network::_apConfigFilePath = "/network/ap.json";
-const char *Network::_ssidFieldName = "ssid";
-const char *Network::_passwordFieldName = "password";
 const char *Network::_defaultStationSsid = "";
 const char *Network::_defaultStationPassword = "";
 const char *Network::_defaultApSsid = "smart-dimmer";
 const char *Network::_defaultApPassword = "12345678";
 
-Network::Network(f_onStateChange onStateChange) {
-  _onStateChange = onStateChange;
-  _stationConfigFields[0].init(
-      Network::_ssidFieldName,
-      _stationConfig.ssid,
-      Network::_defaultStationSsid,
-      CONFIG_FIELD_TYPE_STRING,
-      NETWORK_CONFIG_SSID_BUFFER_SIZE
-      );
-  _stationConfigFields[1].init(
-      Network::_passwordFieldName,
-      _stationConfig.password,
-      Network::_defaultStationPassword,
-      CONFIG_FIELD_TYPE_STRING,
-      NETWORK_CONFIG_PASSWORD_BUFFER_SIZE
-      );
-  _stationConfigFile.init(
-      Network::_stationConfigFilePath,
-      _stationConfigFields,
-      NETWORK_CONFIG_FIELDS_LENGTH
-      );
-  _apConfigFields[0].init(
-      Network::_ssidFieldName,
-      _apConfig.ssid,
-      Network::_defaultApSsid,
-      CONFIG_FIELD_TYPE_STRING,
-      NETWORK_CONFIG_SSID_BUFFER_SIZE
-      );
-  _apConfigFields[1].init(
-      Network::_passwordFieldName,
-      _apConfig.password,
-      Network::_defaultApPassword,
-      CONFIG_FIELD_TYPE_STRING,
-      NETWORK_CONFIG_PASSWORD_BUFFER_SIZE
-      );
-  _apConfigFile.init(
-      Network::_apConfigFilePath,
-      _apConfigFields,
-      NETWORK_CONFIG_FIELDS_LENGTH
-      );
+Network *Network::getInstance() {
+  static Network network;
+  return &network;
 }
 
-void Network::setup() {
-  _stationConfigFile.read();
-  _apConfigFile.read();
+void Network::setup(f_onStateChange onStateChange) {
+  _onStateChange = onStateChange;
+  _stationConfig.init(
+      Network::_stationConfigFilePath,
+      Network::_defaultStationSsid,
+      Network::_defaultStationPassword);
+  _apConfig.init(
+      Network::_apConfigFilePath,
+      Network::_defaultApSsid,
+      Network::_defaultApPassword);
   // TODO: Connect or start AP using setMode
 }
 
@@ -77,39 +44,39 @@ int Network::getMode() {
 }
 
 void Network::setStationConfig(char *ssid, char *password) {
-  strlcpy(_stationConfig.ssid, ssid, NETWORK_CONFIG_SSID_BUFFER_SIZE);
-  strlcpy(_stationConfig.password, password, NETWORK_CONFIG_PASSWORD_BUFFER_SIZE);
-  _stationConfigFile.write();
+  _stationConfig.setConfig(ssid, password);
+  // TODO: connect
 }
 
 void Network::resetStationConfig() {
-  _stationConfigFile.reset();
+  _stationConfig.reset();
+  // TODO: disconnect and start AP?
 }
 
 char *Network::getStationSsid() {
-  return _stationConfig.ssid;
+  return _stationConfig.getSsid();
 }
 
 char *Network::getStationPassword() {
-  return _stationConfig.password;
+  return _stationConfig.getPassword();
 }
 
 void Network::setApConfig(char *ssid, char *password) {
-  strlcpy(_apConfig.ssid, ssid, NETWORK_CONFIG_SSID_BUFFER_SIZE);
-  strlcpy(_apConfig.password, password, NETWORK_CONFIG_PASSWORD_BUFFER_SIZE);
-  _apConfigFile.write();
+  _apConfig.setConfig(ssid, password);
+  // TODO: connect
 }
 
 void Network::resetApConfig() {
-  _apConfigFile.reset();
+  _apConfig.reset();
+  // TODO: restart AP with defaults?
 }
 
 char *Network::getApSsid() {
-  return _apConfig.ssid;
+  return _apConfig.getSsid();
 }
 
 char *Network::getApPassword() {
-  return _apConfig.password;
+  return _apConfig.getPassword();
 }
 
 void Network::scan() {
