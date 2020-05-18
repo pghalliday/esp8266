@@ -1,4 +1,5 @@
-#include "Arduino.h"
+#include <Arduino.h>
+#include <ESP8266WiFi.h>
 #include "Network.h"
 
 const char *Network::_stationConfigFilePath = "/network/station.json";
@@ -27,8 +28,6 @@ void Network::setup(f_onStateChange onStateChange) {
       Network::_apConfigFilePath,
       Network::_defaultApSsid,
       Network::_defaultApPassword);
-
-  // TODO: Connect or start AP using setMode
 }
 
 void Network::loop() {

@@ -1,7 +1,7 @@
 #ifndef WifiConfig_h
 #define WifiConfig_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <functional>
 #include "ConfigFile.h"
 
@@ -28,8 +28,8 @@ class WifiConfig {
     const char *_defaultPassword;
     char _ssid[WIFI_CONFIG_SSID_BUFFER_SIZE];
     char _password[WIFI_CONFIG_PASSWORD_BUFFER_SIZE];
-    static const char *_ssidFieldName;
-    static const char *_passwordFieldName;
+    static const char _ssidFieldName[];
+    static const char _passwordFieldName[];
 };
 
 #endif

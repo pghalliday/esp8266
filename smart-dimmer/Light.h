@@ -1,7 +1,7 @@
 #ifndef Light_h
 #define Light_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <functional>
 
 #define LIGHT_MAX_BRIGHTNESS 25

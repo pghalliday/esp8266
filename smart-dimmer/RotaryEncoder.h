@@ -1,7 +1,7 @@
 #ifndef RotaryEncoder_h
 #define RotaryEncoder_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <functional>
 
 #define ROTARY_ENCODER_BUFFER_SIZE 8

@@ -1,6 +1,6 @@
-#include "Arduino.h"
-#include "ArduinoJson.h"
-#include "LittleFS.h"
+#include <Arduino.h>
+#include <ArduinoJson.h>
+#include <LittleFS.h>
 #include "ConfigFile.h"
 
 void ConfigFile::init(const char *path, JsonDocument *pDoc) {

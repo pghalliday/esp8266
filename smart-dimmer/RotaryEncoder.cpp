@@ -1,4 +1,4 @@
-#include "Arduino.h"
+#include <Arduino.h>
 #include "RotaryEncoder.h"
 
 #define ROTARY_ENCODER_A_RISING 1

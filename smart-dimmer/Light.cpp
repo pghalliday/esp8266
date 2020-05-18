@@ -1,4 +1,4 @@
-#include "Arduino.h"
+#include <Arduino.h>
 #include "Light.h"
 
 #define LIGHT_DEFAULT_BRIGHTNESS LIGHT_MAX_BRIGHTNESS

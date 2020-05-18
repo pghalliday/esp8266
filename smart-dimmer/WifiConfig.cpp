@@ -1,11 +1,10 @@
-#include "Arduino.h"
-#include "ArduinoJson.h"
-#include "LittleFS.h"
+#include <Arduino.h>
+#include <ArduinoJson.h>
 #include "WifiConfig.h"
 
 #define WIFI_CONFIG_FIELD_COUNT 2
-const char *WifiConfig::_ssidFieldName = "ssid";
-const char *WifiConfig::_passwordFieldName = "password";
+const char WifiConfig::_ssidFieldName[] = "ssid";
+const char WifiConfig::_passwordFieldName[] = "password";
 
 void WifiConfig::init(f_onChange onChange, const char *path, const char *defaultSsid, const char *defaultPassword) {
   _onChange = onChange;
@@ -19,6 +18,7 @@ void WifiConfig::init(f_onChange onChange, const char *path, const char *default
     WIFI_CONFIG_PASSWORD_BUFFER_SIZE;
   Serial.print("WifiConfig::init - JSON capacity: ");
   Serial.println(capacity);
+  Serial.println(sizeof(WifiConfig::_passwordFieldName));
   StaticJsonDocument<capacity> doc;
   _configFile.init(path, &doc);
   _applyDoc(&doc);

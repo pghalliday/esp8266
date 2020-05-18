@@ -1,9 +1,9 @@
 #ifndef ConfigFile_h
 #define ConfigFile_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <functional>
-#include "ArduinoJson.h"
+#include <ArduinoJson.h>
 
 class ConfigFile {
   public:

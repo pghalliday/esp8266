@@ -1,7 +1,7 @@
 #ifndef Network_h
 #define Network_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <functional>
 #include "WifiConfig.h"
 
