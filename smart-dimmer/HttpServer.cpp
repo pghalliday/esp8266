@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ESP8266WebServer.h>
 #include <LittleFS.h>
+#include "WifiConfig.h"
 #include "HttpServer.h"
 
 #define HTTP_SERVER_PORT 80
@@ -17,6 +18,16 @@ HttpServer::HttpServer(ESP8266WebServer *pServer) {
 
 void HttpServer::setup(f_onSettings onSettings) {
   _onSettings = onSettings;
+
+  _pServer->on(
+      "/settings",
+      HTTP_GET,
+      [=](){ _handleFileRead("/settings.html"); });
+
+  _pServer->on(
+      "/settings",
+      HTTP_POST,
+      std::bind(&HttpServer::_handleSettings, this));
 
   _pServer->on(
       "/upload",
@@ -41,15 +52,17 @@ void HttpServer::loop() {
 }
 
 String HttpServer::_getContentType(String path) {
-  if (path.endsWith(".html")) return "text/html";
-  if (path.endsWith(".css")) return "text/css";
-  if (path.endsWith(".js")) return "application/javascript";
-  if (path.endsWith(".json")) return "application/json";
-  if (path.endsWith(".png")) return "image/png";
-  if (path.endsWith(".gif")) return "image/gif";
-  if (path.endsWith(".jpg")) return "image/jpeg";
-  if (path.endsWith(".jpeg")) return "image/jpeg";
-  if (path.endsWith(".ico")) return "image/x-icon";
+  String pathLower = path;
+  pathLower.toLowerCase();
+  if (pathLower.endsWith(".html")) return "text/html";
+  if (pathLower.endsWith(".css")) return "text/css";
+  if (pathLower.endsWith(".js")) return "application/javascript";
+  if (pathLower.endsWith(".json")) return "application/json";
+  if (pathLower.endsWith(".png")) return "image/png";
+  if (pathLower.endsWith(".gif")) return "image/gif";
+  if (pathLower.endsWith(".jpg")) return "image/jpeg";
+  if (pathLower.endsWith(".jpeg")) return "image/jpeg";
+  if (pathLower.endsWith(".ico")) return "image/x-icon";
   return "text/plain";
 }
 
@@ -60,9 +73,13 @@ void HttpServer::_handleFileRead(String path) {
   Serial.print(F("HttpServer::_handleFileRead - path: "));
   Serial.println(path);
   String contentType = HttpServer::_getContentType(path);
+  Serial.print(F("HttpServer::_handleFileRead - contentType: "));
+  Serial.println(contentType);
   if (LittleFS.exists(path)) {
     File file = LittleFS.open(path, "r");
     size_t sent = _pServer->streamFile(file, contentType);
+    Serial.print(F("HttpServer::_handleFileRead - sent bytes: "));
+    Serial.println(sent);
     file.close();
     return;
   }
@@ -70,8 +87,24 @@ void HttpServer::_handleFileRead(String path) {
   _pServer->send(404, "text/plain", "404: Not Found");
 }
 
+void HttpServer::_handleSettings() {
+  char ssid[WIFI_CONFIG_SSID_BUFFER_SIZE];
+  char password[WIFI_CONFIG_SSID_BUFFER_SIZE];
+  if (!_pServer->hasArg("ssid") ||
+      !_pServer->hasArg("password") ||
+      _pServer->arg("ssid") == NULL ||
+      _pServer->arg("password") == NULL) {
+      _pServer->send(400, "text/plain", "400: Invalid Request");
+      return;
+  }
+  _pServer->sendHeader("Location", "/success.html");
+  _pServer->send(303);
+  _pServer->arg("ssid").toCharArray(ssid, WIFI_CONFIG_SSID_BUFFER_SIZE);
+  _pServer->arg("password").toCharArray(password, WIFI_CONFIG_PASSWORD_BUFFER_SIZE);
+  _onSettings(ssid, password);
+}
+
 void HttpServer::_handleFileUpload() {
-  static File fsUploadFile;
   Serial.println(F("HttpServer::_handleFileUpload"));
   HTTPUpload &upload = _pServer->upload();
   if (upload.status == UPLOAD_FILE_START) {
@@ -79,15 +112,23 @@ void HttpServer::_handleFileUpload() {
     if (!filename.startsWith("/")) filename = "/" + filename;
     Serial.print(F("HttpServer::_handleFileUpload - Name: "));
     Serial.println(filename);
-    fsUploadFile = LittleFS.open(filename, "w");
+    _uploadFile = LittleFS.open(filename, "w");
+    Serial.print(F("HttpServer::_handleFileUpload - _uploadFile: "));
+    Serial.println(_uploadFile);
     filename = String();
   } else if (upload.status == UPLOAD_FILE_WRITE) {
-    if (fsUploadFile) {
-      fsUploadFile.write(upload.buf, upload.currentSize);
+    if (_uploadFile) {
+      Serial.print(F("HttpServer::_handleFileUpload - upload.currentSize: "));
+      Serial.println(upload.currentSize);
+      Serial.print(F("HttpServer::_handleFileUpload - _uploadFile: "));
+      Serial.println(_uploadFile);
+      size_t size = _uploadFile.write(upload.buf, upload.currentSize);
+      Serial.print(F("HttpServer::_handleFileUpload - bytes written: "));
+      Serial.println(size);
     }
   } else if (upload.status == UPLOAD_FILE_END) {
-    if (fsUploadFile) {
-      fsUploadFile.close();
+    if (_uploadFile) {
+      _uploadFile.close();
       Serial.print(F("HttpServer::_handleFileUpload - Size: "));
       Serial.println(upload.totalSize);
       _pServer->sendHeader("Location", "/success.html");

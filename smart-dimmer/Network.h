@@ -27,11 +27,11 @@ class Network {
     State getState();
     void setMode(Network::Mode);
     Mode getMode();
-    void setStationConfig(char *ssid, char *password);
+    void setStationConfig(const char *ssid, const char *password);
     void resetStationConfig();
     char *getStationSsid();
     char *getStationPassword();
-    void setApConfig(char *ssid, char *password);
+    void setApConfig(const char *ssid, const char *password);
     void resetApConfig();
     char *getApSsid();
     char *getApPassword();

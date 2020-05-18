@@ -18,7 +18,7 @@ RotaryEncoder knob(D5, D6, knobInterruptDispatch, knobOnChange);
 void networkOnStateChange(Network::State state);
 Network *network = Network::getInstance();
 
-void httpServerOnSettings();
+void httpServerOnSettings(const char *ssid, const char *password);
 HttpServer *httpServer = HttpServer::getInstance();
 
 void setup() {
@@ -65,6 +65,11 @@ void networkOnStateChange(Network::State state) {
   Serial.println(static_cast<int>(state));
 }
 
-void httpServerOnSettings() {
-  Serial.println(F("httpServerOnSettings"));
+void httpServerOnSettings(const char *ssid, const char *password) {
+  Serial.print(F("httpServerOnSettings - ssid: ["));
+  Serial.print(ssid);
+  Serial.print(F("], password: ["));
+  Serial.print(password);
+  Serial.println(F("]"));
+  network->setStationConfig(ssid, password);
 }

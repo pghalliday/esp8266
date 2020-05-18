@@ -63,7 +63,7 @@ Network::Mode Network::getMode() {
   return _mode;
 }
 
-void Network::setStationConfig(char *ssid, char *password) {
+void Network::setStationConfig(const char *ssid, const char *password) {
   _stationConfig.setConfig(ssid, password);
 }
 
@@ -88,7 +88,7 @@ void Network::_onStationConfigChange(const char *ssid, const char *password) {
   // TODO: restart station?
 }
 
-void Network::setApConfig(char *ssid, char *password) {
+void Network::setApConfig(const char *ssid, const char *password) {
   _apConfig.setConfig(ssid, password);
 }
 

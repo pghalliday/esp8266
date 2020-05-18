@@ -3,10 +3,11 @@
 
 #include <Arduino.h>
 #include <functional>
+#include <LittleFS.h>
 #include <ESP8266WebServer.h>
 
 class HttpServer {
-  using f_onSettings = std::function<void()>;
+  using f_onSettings = std::function<void(const char *ssid, const char *password)>;
 
   public:
     static HttpServer *getInstance();
@@ -20,6 +21,8 @@ class HttpServer {
     ESP8266WebServer *_pServer;
     void _handleFileRead(String path);
     void _handleFileUpload();
+    void _handleSettings();
+    File _uploadFile;
     static String _getContentType(String path);
 };
 
