@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include <functional>
+#include "ConfigFile.h"
 
 #define WIFI_CONFIG_SSID_BUFFER_SIZE 33
 #define WIFI_CONFIG_PASSWORD_BUFFER_SIZE 64
@@ -19,9 +20,10 @@ class WifiConfig {
     void reset();
   private:
     f_onChange _onChange;
+    ConfigFile _configFile;
     void _read();
+    void _applyDoc(JsonDocument *pDoc);
     void _applyConfig(const char *ssid, const char *password);
-    const char *_path;
     const char *_defaultSsid;
     const char *_defaultPassword;
     char _ssid[WIFI_CONFIG_SSID_BUFFER_SIZE];

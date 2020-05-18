@@ -24,14 +24,12 @@ void setup() {
   button.setup();
   knob.setup();
   network->setup(networkOnStateChange);
-  config_setup(D2, 5000);
 }
 
 void loop() {
   button.loop();
   knob.loop();
   network->loop();
-  config_loop();
 }
 
 void lightOnUpdate(bool on, int brightness) {
