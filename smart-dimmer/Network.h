@@ -2,6 +2,7 @@
 #define Network_h
 
 #include "Arduino.h"
+#include <functional>
 #include "WifiConfig.h"
 
 #define NETWORK_MODE_AP 1
@@ -14,7 +15,7 @@
 #define NETWORK_CONFIG_FIELDS_LENGTH 2
 
 class Network {
-  using f_onStateChange = void(*)(int state);
+  using f_onStateChange = std::function<void(int state)>;
 
   public:
     static Network *getInstance();
@@ -44,7 +45,9 @@ class Network {
     static const char *_defaultApPassword;
     f_onStateChange _onStateChange;
     WifiConfig _stationConfig;
+    void _onStationConfigChange(const char *ssid, const char *password);
     WifiConfig _apConfig;
+    void _onApConfigChange(const char *ssid, const char *password);
     int _mode;
 };
 

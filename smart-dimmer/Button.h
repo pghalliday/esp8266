@@ -2,9 +2,10 @@
 #define Button_h
 
 #include "Arduino.h"
+#include <functional>
 
 class Button {
-  using f_onRelease = void(*)();
+  using f_onRelease = std::function<void()>;
 
   public:
     Button(int pin, f_onRelease onRelease);

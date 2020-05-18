@@ -2,14 +2,17 @@
 #define RotaryEncoder_h
 
 #include "Arduino.h"
+#include <functional>
 
 #define ROTARY_ENCODER_BUFFER_SIZE 8
 #define ROTARY_ENCODER_LEFT (-1)
 #define ROTARY_ENCODER_RIGHT 1
 
 class RotaryEncoder {
+  using f_onChange = std::function<void(int direction)>;
+
+  // can't use <functional> stuff with attachInterrupt
   using f_interruptDispatch = void(*)();
-  using f_onChange = void(*)(int direction);
 
   public:
     RotaryEncoder(int pinA, int pinB, f_interruptDispatch interruptDispatch, f_onChange onChange);

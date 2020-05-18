@@ -2,11 +2,12 @@
 #define Light_h
 
 #include "Arduino.h"
+#include <functional>
 
 #define LIGHT_MAX_BRIGHTNESS 25
 
 class Light {
-  using f_onUpdate = void(*)(bool on, int brightness);
+  using f_onUpdate = std::function<void(bool on, int brightness)>;
 
   public:
     Light(int pin, f_onUpdate onUpdate);
