@@ -93,8 +93,9 @@ void HttpServer::_handleFileRead(String path) {
 }
 
 void HttpServer::_handleSettings() {
-  char ssid[WIFI_CONFIG_SSID_BUFFER_SIZE];
-  char password[WIFI_CONFIG_SSID_BUFFER_SIZE];
+  char ssid[WIFI_CONFIG_SSID_BUFFER_SIZE] = "";
+  char password[WIFI_CONFIG_PASSWORD_BUFFER_SIZE] = "";
+  DEBUG_VAL(F("POST data received"), F("raw"), _pServer->arg("plain")); 
   if (!_pServer->hasArg("ssid") ||
       !_pServer->hasArg("password") ||
       _pServer->arg("ssid") == NULL ||
