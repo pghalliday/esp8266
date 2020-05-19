@@ -9,8 +9,13 @@
 //#define DEBUG
 #include "debug.h"
 
+// LittleFS seems to not like to open files in directories
+// that do not exist, even though the docs say it should create
+// them automatically. So to keep things simple we put
+// everything in the root
 const char *Network::_stationConfigFilePath = "/station.json";
 const char *Network::_apConfigFilePath = "/ap.json";
+
 const char *Network::_defaultStationSsid = "";
 const char *Network::_defaultStationPassword = "";
 const char *Network::_defaultApSsid = "smart-dimmer";
