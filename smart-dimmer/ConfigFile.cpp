@@ -3,59 +3,66 @@
 #include <LittleFS.h>
 #include "ConfigFile.h"
 
+/*
+ * Uncomment the next line to enable
+ * debug output to serial for this file
+ */
+//#define DEBUG
+#include "debug.h"
+
 void ConfigFile::init(const char *path, JsonDocument *pDoc) {
+  DEBUG_VAL(F("check file"), F("path"), path);
   _path = path;
 
   if (LittleFS.exists(_path)) {
     return _read(pDoc);
   }
 
-  Serial.print(F("ConfigFile::init - File does not exist ["));
-  Serial.print(_path);
-  Serial.println(F("]"));
+  DEBUG_VAL(F("File does not exist"), F("_path"), _path);
 }
 
 void ConfigFile::_read(JsonDocument *pDoc) {
   File file = LittleFS.open(_path, "r");
   if (file) {
+    DEBUG_LIST_START(F("file opened"));
+    DEBUG_LIST_VAL(F("size"), file.size());
+    // This call to readString moves the file stream to the end
+    // when DEBUG is enabled
+    DEBUG_LIST_VAL(F("contents"), file.readString());
+    DEBUG_LIST_END;
+    // This call to seek moves the file stream back to the beginning
+    // when DEBUG is enabled so that the deserialize can work
+    DEBUG_DO(file.seek(0, SeekSet));
     DeserializationError error = deserializeJson(*pDoc, file);
     if (error) {
-      Serial.print(F("ConfigFile::read - Failed to deserialize file ["));
-      Serial.print(_path);
-      Serial.print(F("], error: ["));
-      Serial.print(error.c_str());
-      Serial.println(F("]"));
+      DEBUG_LIST_START(F("Failed to deserialize file"));
+      DEBUG_LIST_VAL(F("_path"), _path);
+      DEBUG_LIST_VAL(F("error"), error.c_str());
+      DEBUG_LIST_END;
     }
     file.close();
     return;
   }
 
-  Serial.print(F("ConfigFile::_read - Failed to open file ["));
-  Serial.print(_path);
-  Serial.println(F("]"));
+  DEBUG_VAL(F("Failed to open file"), F("_path"), _path);
   return;
 }
 
 void ConfigFile::write(JsonDocument *pDoc) {
   File file = LittleFS.open(_path, "w");
+  DEBUG_VAL(F("opened file"), F("handle"), file);
   if (file) {
     if (serializeJson(*pDoc, file) == 0) {
-      Serial.print(F("ConfigFile::write - Failed to write file ["));
-      Serial.print(_path);
-      Serial.println(F("]"));
+      DEBUG_VAL(F("Failed to write file"), F("_path"), _path);
     }
     file.close();
   } else {
-    Serial.print(F("ConfigFile::write - Failed to open file ["));
-    Serial.print(_path);
-    Serial.println(F("]"));
+    DEBUG_VAL(F("Failed to open file"), F("_path"), _path);
   }
 }
 
 void ConfigFile::remove() {
   if (!LittleFS.remove(_path)) {
-    Serial.print(F("ConfigFile::remove - Failed to remove file ["));
-    Serial.print(_path);
-    Serial.println(F("]"));
+    DEBUG_VAL(F("Failed to remove file"), F("_path"), _path);
   }
 }

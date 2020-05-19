@@ -4,6 +4,13 @@
 #include "WifiConfig.h"
 #include "HttpServer.h"
 
+/*
+ * Uncomment the next line to enable
+ * debug output to serial for this file
+ */
+//#define DEBUG
+#include "debug.h"
+
 #define HTTP_SERVER_PORT 80
 
 HttpServer *HttpServer::getInstance() {
@@ -43,8 +50,8 @@ void HttpServer::setup(f_onSettings onSettings) {
   _pServer->onNotFound([=](){ _handleFileRead(_pServer->uri()); });
 
   _pServer->begin();
-  Serial.print(F("HTTP server started on port: "));
-  Serial.println(HTTP_SERVER_PORT);
+
+  DEBUG_VAL(F("HTTP Server started"), F("port"), HTTP_SERVER_PORT);
 }
 
 void HttpServer::loop() {
@@ -67,23 +74,21 @@ String HttpServer::_getContentType(String path) {
 }
 
 void HttpServer::_handleFileRead(String path) {
+  DEBUG_VAL(F("start"), F("path"), path);
   if (path.endsWith("/")) {
     path += "index.html";
   }
-  Serial.print(F("HttpServer::_handleFileRead - path: "));
-  Serial.println(path);
+  DEBUG_VAL(F("adjusted"), F("path"), path);
   String contentType = HttpServer::_getContentType(path);
-  Serial.print(F("HttpServer::_handleFileRead - contentType: "));
-  Serial.println(contentType);
+  DEBUG_VAL(F("checked content type"), F("contentType"), contentType);
   if (LittleFS.exists(path)) {
     File file = LittleFS.open(path, "r");
     size_t sent = _pServer->streamFile(file, contentType);
-    Serial.print(F("HttpServer::_handleFileRead - sent bytes: "));
-    Serial.println(sent);
+    DEBUG_VAL(F("file streamed"), F("sent bytes"), sent);
     file.close();
     return;
   }
-  Serial.println(F("HttpServer::_handleFileRead - file not found"));
+  DEBUG_MSG(F("file not found"));
   _pServer->send(404, "text/plain", "404: Not Found");
 }
 
@@ -105,32 +110,28 @@ void HttpServer::_handleSettings() {
 }
 
 void HttpServer::_handleFileUpload() {
-  Serial.println(F("HttpServer::_handleFileUpload"));
   HTTPUpload &upload = _pServer->upload();
   if (upload.status == UPLOAD_FILE_START) {
     String filename = upload.filename;
+    DEBUG_VAL(F("started upload"), F("filename"), filename);
     if (!filename.startsWith("/")) filename = "/" + filename;
-    Serial.print(F("HttpServer::_handleFileUpload - Name: "));
-    Serial.println(filename);
+    DEBUG_VAL(F("adjusted filename"), F("filename"), filename);
     _uploadFile = LittleFS.open(filename, "w");
-    Serial.print(F("HttpServer::_handleFileUpload - _uploadFile: "));
-    Serial.println(_uploadFile);
+    DEBUG_VAL(F("opened file"), F("handle"), _uploadFile);
     filename = String();
   } else if (upload.status == UPLOAD_FILE_WRITE) {
+    DEBUG_LIST_START(F("received chunk"));
+    DEBUG_LIST_VAL(F("bytes"), upload.currentSize);
+    DEBUG_LIST_VAL(F("file handle"), _uploadFile);
+    DEBUG_LIST_END;
     if (_uploadFile) {
-      Serial.print(F("HttpServer::_handleFileUpload - upload.currentSize: "));
-      Serial.println(upload.currentSize);
-      Serial.print(F("HttpServer::_handleFileUpload - _uploadFile: "));
-      Serial.println(_uploadFile);
       size_t size = _uploadFile.write(upload.buf, upload.currentSize);
-      Serial.print(F("HttpServer::_handleFileUpload - bytes written: "));
-      Serial.println(size);
+      DEBUG_VAL(F("bytes written"), F("size"), size);
     }
   } else if (upload.status == UPLOAD_FILE_END) {
     if (_uploadFile) {
+      DEBUG_VAL(F("upload complete"), F("total size"), upload.totalSize);
       _uploadFile.close();
-      Serial.print(F("HttpServer::_handleFileUpload - Size: "));
-      Serial.println(upload.totalSize);
       _pServer->sendHeader("Location", "/success.html");
       _pServer->send(303);
     } else {

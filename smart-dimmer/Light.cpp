@@ -1,6 +1,13 @@
 #include <Arduino.h>
 #include "Light.h"
 
+/*
+ * Uncomment the next line to enable
+ * debug output to serial for this file
+ */
+//#define DEBUG
+#include "debug.h"
+
 #define LIGHT_DEFAULT_BRIGHTNESS LIGHT_MAX_BRIGHTNESS
 #define LIGHT_DEFAULT_ON false
 
@@ -29,8 +36,7 @@ void Light::_update() {
     digitalWrite(_pin, LOW);
   } else {
     int pwmLevel = LIGHT_PWM_LEVEL(_brightness);
-    Serial.print(F("Light::_update: pwmLevel: "));
-    Serial.println(pwmLevel);
+    DEBUG_VAL(F("setting output"), F("pwmLevel"), pwmLevel);
     analogWrite(_pin, pwmLevel);
   }
 

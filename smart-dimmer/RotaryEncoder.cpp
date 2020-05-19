@@ -1,6 +1,13 @@
 #include <Arduino.h>
 #include "RotaryEncoder.h"
 
+/*
+ * Uncomment the next line to enable
+ * debug output to serial for this file
+ */
+//#define DEBUG
+#include "debug.h"
+
 #define ROTARY_ENCODER_A_RISING 1
 #define ROTARY_ENCODER_A_FALLING 2
 #define ROTARY_ENCODER_B_RISING 3

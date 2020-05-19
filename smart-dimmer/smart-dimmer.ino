@@ -5,6 +5,13 @@
 #include "Network.h"
 #include "HttpServer.h"
 
+/*
+ * Uncomment the next line to enable
+ * debug output to serial for this file
+ */
+//#define DEBUG
+#include "debug.h"
+
 void lightOnUpdate(bool on, int brightness);
 Light light(D1, lightOnUpdate);
 
@@ -39,14 +46,14 @@ void loop() {
 }
 
 void lightOnUpdate(bool on, int brightness) {
-  Serial.print(F("lightOnUpdate - on: "));
-  Serial.print(on);
-  Serial.print(F(": brightness: "));
-  Serial.println(brightness);
+  DEBUG_LIST_START(F("new value"));
+  DEBUG_LIST_VAL(F("on"), on);
+  DEBUG_LIST_VAL(F("brightness"), brightness);
+  DEBUG_LIST_END;
 }
 
 void buttonOnRelease() {
-  Serial.println(F("buttonOnRelease"));
+  DEBUG_MSG(F("toggle the light"));
   light.toggle();
 }
 
@@ -55,21 +62,18 @@ void knobInterruptDispatch() {
 }
 
 void knobOnChange(int direction) {
-  Serial.print(F("knobOnChange - direction: "));
-  Serial.println(direction);
+  DEBUG_VAL(F("change the light brightness"), F("change"), direction);
   light.changeBrightness(direction);
 }
 
 void networkOnStateChange(Network::State state) {
-  Serial.print(F("networkOnStateChange - state: "));
-  Serial.println(static_cast<int>(state));
+  DEBUG_VAL(F("new state"), F("state"), static_cast<int>(state));
 }
 
 void httpServerOnSettings(const char *ssid, const char *password) {
-  Serial.print(F("httpServerOnSettings - ssid: ["));
-  Serial.print(ssid);
-  Serial.print(F("], password: ["));
-  Serial.print(password);
-  Serial.println(F("]"));
+  DEBUG_LIST_START(F("new settings"));
+  DEBUG_LIST_VAL(F("ssid"), ssid);
+  DEBUG_LIST_VAL(F("password"), password);
+  DEBUG_LIST_END;
   network->setStationConfig(ssid, password);
 }

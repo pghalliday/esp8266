@@ -2,8 +2,15 @@
 #include <ESP8266WiFi.h>
 #include "Network.h"
 
-const char *Network::_stationConfigFilePath = "/config/network/station.json";
-const char *Network::_apConfigFilePath = "/config/network/ap.json";
+/*
+ * Uncomment the next line to enable
+ * debug output to serial for this file
+ */
+//#define DEBUG
+#include "debug.h"
+
+const char *Network::_stationConfigFilePath = "/station.json";
+const char *Network::_apConfigFilePath = "/ap.json";
 const char *Network::_defaultStationSsid = "";
 const char *Network::_defaultStationPassword = "";
 const char *Network::_defaultApSsid = "smart-dimmer";
@@ -36,11 +43,10 @@ void Network::loop() {
   // TODO: Check status and notify state changes
   if (_state == Network::State::IDLE) {
     if (WiFi.softAP(_apConfig.getSsid(), _apConfig.getPassword())) {
-      Serial.print(F("Network::loop - Started AP, IP address: "));
-      Serial.println(WiFi.softAPIP());
+      DEBUG_VAL(F("started AP"), F("IP"), WiFi.softAPIP());
       _setState(Network::State::AP_ACTIVE);
     } else {
-      Serial.println(F("Network::loop - Failed to start AP"));
+      DEBUG_MSG(F("failed to start AP"));
     }
   }
 }
@@ -80,11 +86,10 @@ char *Network::getStationPassword() {
 }
 
 void Network::_onStationConfigChange(const char *ssid, const char *password) {
-  Serial.print(F("Network::_onStationConfigChange - ssid: ["));
-  Serial.print(ssid);
-  Serial.print(F("], password: ["));
-  Serial.print(password);
-  Serial.println(F("]"));
+  DEBUG_LIST_START(F("new station config"));
+  DEBUG_LIST_VAL(F("ssid"), ssid);
+  DEBUG_LIST_VAL(F("password"), password);
+  DEBUG_LIST_END;
   // TODO: restart station?
 }
 
@@ -105,11 +110,10 @@ char *Network::getApPassword() {
 }
 
 void Network::_onApConfigChange(const char *ssid, const char *password) {
-  Serial.print(F("Network::_onApConfigChange - ssid: ["));
-  Serial.print(ssid);
-  Serial.print(F("], password: ["));
-  Serial.print(password);
-  Serial.println(F("]"));
+  DEBUG_LIST_START(F("new AP config"));
+  DEBUG_LIST_VAL(F("ssid"), ssid);
+  DEBUG_LIST_VAL(F("password"), password);
+  DEBUG_LIST_END;
   // TODO: restart AP?
 }
 
