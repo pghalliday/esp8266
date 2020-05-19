@@ -16,7 +16,9 @@
 To upload the contents of `data/` to the ESP8266
 
 - Open the Arduino IDE to the sketch
-- Select `Tools/Board/Generic ESP8266 Module` - see note on flash size as to why we don't use `LOLIN(Wemos) D1 mini pro`
-- Select `Tools/Flash Size/4MB (FS:2MB OTA:~1019KB)` - this seems to work but was actually chosen pretty randomly as the upload tool detected 4MB of flash even though the `LOLIN(Wemos) D1 mini pro` board options seem to only allow a selection of 16MB (which fails to upload)
+- Select `Tools/Board/LOLIN(WEMOS) D1 R2 & mini` - see note on flash size as to why we don't use `LOLIN(Wemos) D1 mini pro`
+- Select `Tools/Flash Size/4MB (FS:2MB OTA:~1019KB)` - this seems to work but was actually chosen pretty randomly as the upload tool detected 4MB of flash even though the `LOLIN(Wemos) D1 mini pro` board options seem to only allow a selection of 16MB (which fails to upload) - NB. Turns out my boards only have a 4MB flash chip!!
 - Select `Tools/ESP8266 LittleFS Data Upload` to upload.
+
+It also turns out that the LittleFS integration does not work properly if compiled with the `d1-mini-pro` FQBN but does with `d1-mini`
 

@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <functional>
 #include <ArduinoJson.h>
+#include "Storage.h"
 
 class ConfigFile {
   public:
@@ -14,6 +15,7 @@ class ConfigFile {
   private:
     void _read(JsonDocument *pDoc);
     const char *_path;
+    Storage *_pStorage;
 };
 
 #endif

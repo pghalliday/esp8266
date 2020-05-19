@@ -1,7 +1,7 @@
 #include "Light.h"
 #include "Button.h"
 #include "RotaryEncoder.h"
-#include "LittleFS.h"
+#include "Storage.h"
 #include "Network.h"
 #include "HttpServer.h"
 
@@ -11,6 +11,8 @@
  */
 //#define DEBUG
 #include "debug.h"
+
+Storage *pStorage = Storage::getInstance();
 
 void lightOnUpdate(bool on, int brightness);
 Light light(D1, lightOnUpdate);
@@ -23,26 +25,26 @@ void knobOnChange(int direction);
 RotaryEncoder knob(D5, D6, knobInterruptDispatch, knobOnChange);
 
 void networkOnStateChange(Network::State state);
-Network *network = Network::getInstance();
+Network *pNetwork = Network::getInstance();
 
 void httpServerOnSettings(const char *ssid, const char *password);
-HttpServer *httpServer = HttpServer::getInstance();
+HttpServer *pHttpServer = HttpServer::getInstance();
 
 void setup() {
-  Serial.begin(9600);
-  LittleFS.begin();
+  Serial.begin(115200);
+  pStorage->setup();
   light.setup();
   button.setup();
   knob.setup();
-  network->setup(networkOnStateChange);
-  httpServer->setup(httpServerOnSettings);
+  pNetwork->setup(networkOnStateChange);
+  pHttpServer->setup(httpServerOnSettings);
 }
 
 void loop() {
   button.loop();
   knob.loop();
-  network->loop();
-  httpServer->loop();
+  pNetwork->loop();
+  pHttpServer->loop();
 }
 
 void lightOnUpdate(bool on, int brightness) {
@@ -75,5 +77,5 @@ void httpServerOnSettings(const char *ssid, const char *password) {
   DEBUG_LIST_VAL(F("ssid"), ssid);
   DEBUG_LIST_VAL(F("password"), password);
   DEBUG_LIST_END;
-  network->setStationConfig(ssid, password);
+  pNetwork->setStationConfig(ssid, password);
 }

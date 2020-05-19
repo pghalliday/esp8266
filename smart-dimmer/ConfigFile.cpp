@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include <LittleFS.h>
+#include "Storage.h"
 #include "ConfigFile.h"
 
 /*
@@ -11,10 +11,12 @@
 #include "debug.h"
 
 void ConfigFile::init(const char *path, JsonDocument *pDoc) {
+  _pStorage = Storage::getInstance();
+
   DEBUG_VAL(F("check file"), F("path"), path);
   _path = path;
 
-  if (LittleFS.exists(_path)) {
+  if (_pStorage->exists(_path)) {
     return _read(pDoc);
   }
 
@@ -22,7 +24,7 @@ void ConfigFile::init(const char *path, JsonDocument *pDoc) {
 }
 
 void ConfigFile::_read(JsonDocument *pDoc) {
-  File file = LittleFS.open(_path, "r");
+  File file = _pStorage->open(_path, "r");
   if (file) {
     DEBUG_LIST_START(F("file opened"));
     DEBUG_LIST_VAL(F("size"), file.size());
@@ -49,7 +51,7 @@ void ConfigFile::_read(JsonDocument *pDoc) {
 }
 
 void ConfigFile::write(JsonDocument *pDoc) {
-  File file = LittleFS.open(_path, "w");
+  File file = _pStorage->open(_path, "w");
   DEBUG_VAL(F("opened file"), F("handle"), file);
   if (file) {
     if (serializeJson(*pDoc, file) == 0) {
@@ -62,7 +64,7 @@ void ConfigFile::write(JsonDocument *pDoc) {
 }
 
 void ConfigFile::remove() {
-  if (!LittleFS.remove(_path)) {
+  if (!_pStorage->remove(_path)) {
     DEBUG_VAL(F("Failed to remove file"), F("_path"), _path);
   }
 }

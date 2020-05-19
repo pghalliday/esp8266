@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <ESP8266WebServer.h>
-#include <LittleFS.h>
 #include "WifiConfig.h"
+#include "Storage.h"
 #include "HttpServer.h"
 
 /*
@@ -20,6 +20,7 @@ HttpServer *HttpServer::getInstance() {
 }
 
 HttpServer::HttpServer(ESP8266WebServer *pServer) {
+  _pStorage = Storage::getInstance();
   _pServer = pServer;
 }
 
@@ -81,8 +82,8 @@ void HttpServer::_handleFileRead(String path) {
   DEBUG_VAL(F("adjusted"), F("path"), path);
   String contentType = HttpServer::_getContentType(path);
   DEBUG_VAL(F("checked content type"), F("contentType"), contentType);
-  if (LittleFS.exists(path)) {
-    File file = LittleFS.open(path, "r");
+  if (_pStorage->exists(path)) {
+    File file = _pStorage->open(path, "r");
     size_t sent = _pServer->streamFile(file, contentType);
     DEBUG_VAL(F("file streamed"), F("sent bytes"), sent);
     file.close();
@@ -117,7 +118,7 @@ void HttpServer::_handleFileUpload() {
     DEBUG_VAL(F("started upload"), F("filename"), filename);
     if (!filename.startsWith("/")) filename = "/" + filename;
     DEBUG_VAL(F("adjusted filename"), F("filename"), filename);
-    _uploadFile = LittleFS.open(filename, "w");
+    _uploadFile = _pStorage->open(filename, "w");
     DEBUG_VAL(F("opened file"), F("handle"), _uploadFile);
     filename = String();
   } else if (upload.status == UPLOAD_FILE_WRITE) {
@@ -126,8 +127,8 @@ void HttpServer::_handleFileUpload() {
     DEBUG_LIST_VAL(F("file handle"), _uploadFile);
     DEBUG_LIST_END;
     if (_uploadFile) {
-      size_t size = _uploadFile.write(upload.buf, upload.currentSize);
-      DEBUG_VAL(F("bytes written"), F("size"), size);
+      size_t bytesWritten = _uploadFile.write(upload.buf, upload.currentSize);
+      DEBUG_VAL(F("bytes written"), F("bytesWritten"), bytesWritten);
     }
   } else if (upload.status == UPLOAD_FILE_END) {
     if (_uploadFile) {
