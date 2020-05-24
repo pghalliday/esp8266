@@ -3,4 +3,4 @@
 *.bin
 
 # local secrets
-blynk/secrets.h
+secrets.h
