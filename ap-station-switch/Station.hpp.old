@@ -1,0 +1,164 @@
+#ifndef Station_hpp
+#define Station_hpp
+
+/*
+#define WIFI_SSID
+#define WIFI_PASS
+*/
+#include "secrets.h"
+
+#include <Arduino.h>
+#include <ESP8266WiFi.h>
+
+class Station {
+  wl_status_t _status;
+  bool _started;
+  bool _scanning;
+  bool _retry;
+
+  static const __FlashStringHelper * _statusString(wl_status_t status) {
+    switch (status) {
+      case WL_NO_SHIELD:
+        return F("WL_NO_SHIELD");
+      case WL_IDLE_STATUS:
+        return F("WL_IDLE_STATUS");
+      case WL_NO_SSID_AVAIL:
+        return F("WL_NO_SSID_AVAIL");
+      case WL_SCAN_COMPLETED:
+        return F("WL_SCAN_COMPLETED");
+      case WL_CONNECTED:
+        return F("WL_CONNECTED");
+      case WL_CONNECT_FAILED:
+        return F("WL_CONNECT_FAILED");
+      case WL_CONNECTION_LOST:
+        return F("WL_CONNECTION_LOST");
+      case WL_DISCONNECTED:
+        return F("WL_DISCONNECTED");
+      default:
+        return F("UNKNOWN");
+    } 
+  }
+
+  void _start() {
+    Serial.printf(
+      "Connecting to ssid [%s], with password [%s]\n",
+      WIFI_SSID,
+      WIFI_PASS
+    );
+    WiFi.begin(WIFI_SSID, WIFI_PASS);
+    WiFi.printDiag(Serial);
+  }
+
+  void _handleIdle() {
+    if (_started) {
+      Serial.println("WL_IDLE_STATUS while started: possibly means a scan was started while connecting, will retry the connection when no longer scanning");
+      if (!_scanning) {
+        _start();
+      } else {
+        _retry = true;
+      }
+    }
+  }
+
+  void _checkRetry() {
+    if (_retry) {
+      _retry = false;
+      if (_started) {
+        _start();
+      }
+    }
+  }
+
+  void _handleStatus(wl_status_t status) {
+    if (status != _status) {
+      Serial.printf("new WiFi status: %s\n", Station::_statusString(status));
+      switch (status) {
+        case WL_CONNECTED:
+          Serial.printf("Station IP Address: %s\n", WiFi.localIP().toString().c_str());
+          WiFi.printDiag(Serial);
+          break;
+        case WL_IDLE_STATUS:
+          _handleIdle();
+          break;
+      }
+      _status = status;
+    }
+  }
+
+  public:
+    Station() :
+      _started(false),
+      _scanning(false),
+      _retry(false) {
+    }
+
+    void setup() {
+      Serial.println("Ensure that station is stopped");
+      WiFi.disconnect(true);
+      WiFi.printDiag(Serial);
+      _status = WiFi.status();
+      Serial.printf("initial WiFi status: %s\n", Station::_statusString(_status));
+      Serial.println("Turn on WiFi auto-reconnect");
+      WiFi.setAutoReconnect(true);
+    }
+
+    void loop() {
+      _handleStatus(WiFi.status());
+    }
+
+    void stop() {
+      if (_started) {
+        Serial.println("Disconnecting and setting station mode to off");
+        WiFi.disconnect(true);
+        WiFi.printDiag(Serial);
+        _started = false;
+      }
+    }
+
+    void start() {
+      if (!_started) {
+        _start();
+        _started = true;
+      }
+    }
+
+    void toggle() {
+      if (_started) {
+        stop();
+      } else {
+        start();
+      }
+    }
+
+    void scan() {
+      if (!_scanning) {
+        Serial.println("Start scanning asynchronously for networks (including hidden networks)");
+        _scanning = true;
+        WiFi.scanNetworksAsync([=](int networksFound) {
+          Serial.printf("Scan complete, found %d networks\n", networksFound);
+          for (int i = 0; i < networksFound; i++) {
+            Serial.printf(
+              "%d: %s, Ch:%d (%ddBm) %s\n",
+              i + 1,
+              WiFi.SSID(i).c_str(),
+              WiFi.channel(i),
+              WiFi.RSSI(i),
+              WiFi.encryptionType(i) == ENC_TYPE_NONE ? "open" : ""
+            );
+          }
+          WiFi.scanDelete();
+          _scanning = false;
+          _checkRetry();
+        }, true);
+      }
+    }
+
+    void wpsStart() {
+      Serial.println("Starting WPS config");
+      bool result = WiFi.beginWPSConfig();
+      Serial.printf("Start WPS config: [%s]\n", result ? "Success" : "Failed");
+      Serial.printf("Wifi status: [%s]\n", _statusString(WiFi.status()));
+    }
+};
+
+#endif
